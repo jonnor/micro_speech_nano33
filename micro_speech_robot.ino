@@ -47,6 +47,8 @@ constexpr int kTensorArenaSize = 10 * 1024;
 alignas(16) uint8_t tensor_arena[kTensorArenaSize];
 int8_t feature_buffer[kFeatureElementCount];
 int8_t* model_input_buffer = nullptr;
+
+TfLiteStatus init_status = kTfLiteError;
 }  // namespace
 
 // The name of this function is important for Arduino compatibility.
@@ -63,6 +65,8 @@ void setup() {
         model->version(), TFLITE_SCHEMA_VERSION);
     return;
   }
+
+  MicroPrintf("Model loaded");
 
   // Pull in only the operation implementations we need.
   // This relies on a complete list of all the ops needed by this graph.
@@ -85,6 +89,8 @@ void setup() {
   if (micro_op_resolver.AddReshape() != kTfLiteOk) {
     return;
   }
+
+MicroPrintf("Operations resolved");
 
   // Build an interpreter to run the model with.
   static tflite::MicroInterpreter static_interpreter(
@@ -122,7 +128,7 @@ void setup() {
   previous_time = 0;
 
   // start the audio
-  TfLiteStatus init_status = InitAudioRecording();
+  init_status = InitAudioRecording();
   if (init_status != kTfLiteOk) {
     MicroPrintf("Unable to initialize audio");
     return;
@@ -133,6 +139,12 @@ void setup() {
 
 // The name of this function is important for Arduino compatibility.
 void loop() {
+
+   if (init_status != kTfLiteOk) {
+      MicroPrintf("Not initialized");
+      delay(1000);
+   }
+  
 #ifdef PROFILE_MICRO_SPEECH
   const uint32_t prof_start = millis();
   static uint32_t prof_count = 0;

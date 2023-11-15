@@ -1,8 +1,8 @@
 
 #include "micro_features_model.h"
 
-#if 1
+#if 0
 #include "model_original.h"
 #else
-#include "model_yes_no_1200.h"
+#include "model_yes_no_12k.h"
 #endif

@@ -125,7 +125,7 @@ MicroPrintf("Operations resolved");
                                                  feature_buffer);
   feature_provider = &static_feature_provider;
 
-  static RecognizeCommands static_recognizer;
+  static RecognizeCommands static_recognizer(1000, 100, 1500, 3);
   recognizer = &static_recognizer;
 
   previous_time = 0;
